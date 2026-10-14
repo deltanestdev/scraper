@@ -1,4 +1,3 @@
-pip install "python-telegram-bot[job-queue]"
 pip install python-dotenv
 pip install requests
 pip install beautifulsoup4

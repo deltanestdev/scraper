@@ -1,11 +1,13 @@
 import logging
 import os
-import asyncio
-
+import requests
 from dotenv import load_dotenv
-from telegram.ext import Application, ApplicationBuilder
 
 from scraper import buscar_plantilla
+
+# Usamos rutas absolutas
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FLAG_FILE = os.path.join(BASE_DIR, "encontrada.flag")
 
 # Configuramos el sistema de logs
 logging.basicConfig(
@@ -30,27 +32,40 @@ load_dotenv()
 TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 GROUP_ID = os.environ["TELEGRAM_GROUP_ID"]
 
-# Función que se ejecuta automáticamente al arrancar el bot
-async def post_init(app: Application) -> None:
+# Funcion para mandar a telegram el mensaje
+def enviar_telegram(mensaje: str):
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    payload = {
+        "chat_id": GROUP_ID,
+        "text": mensaje,
+        "parse_mode": "HTML"
+    }
+    r = requests.post(url, json=payload, timeout=10)
+    r.raise_for_status()
+
+def main():
+    # 1. Si ya hemos avisado antes, salimos sin hacer nada
+    if os.path.exists(FLAG_FILE):
+        return
+
     try:
-        await app.bot.send_message(
-            chat_id=GROUP_ID,
-            text="Hola grupo, soy el mensajero."
-        )
-        logger.info("Mensaje de bienvenida enviado al grupo.")
+        resultado = buscar_plantilla()
+        if resultado:
+            texto, enlace = resultado
+            mensaje = f"🚨 <b>Tenemos la plantilla definitiva!</b>\n\n📄 {texto}\n🔗 <a href='{enlace}'>Descargar documento</a>"
+            
+            enviar_telegram(mensaje)
+            logger.info(f"Plantilla encontrada y enviada: {texto}")
+            
+            # Creamos el archivo flag para no volver a mandarlo cada hora siguiente
+            with open(FLAG_FILE, "w") as f:
+                f.write("OK")
+        else:
+            logger.info("Comprobado: Aún sin plantilla definitiva.")
+            
     except Exception as e:
-        logger.error(f"Error al enviar mensaje al grupo: {e}")
-
-# Función principal
-def main() -> None:
-
-    # Crea la app del bot conectándose a Telegram
-    app = ApplicationBuilder().token(TOKEN).post_init(post_init).build()
-
-    logger.info("Iniciando el bot...")
-    # Activa el bot
-    app.run_polling()
-
+        logger.error(f"Fallo en la comprobación: {e}")
 
 if __name__ == "__main__":
     main()
+    
