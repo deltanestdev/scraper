@@ -1,5 +1,22 @@
+# Variables de entorno
 .env
-.venv
+
+# Datos de persistencia de Docker y ejecuciones locales
+data/
 *.log
+*.flag
+
+# Caché de Python
 __pycache__/
-encontrada.flag
+*.py[cod]
+
+# Entornos virtuales 
+venv/
+.venv/
+env/
+
+# Archivos de configuración
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

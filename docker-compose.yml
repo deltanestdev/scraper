@@ -1,0 +1,10 @@
+services:
+  inap-scraper:
+    build: .
+    container_name: bot_tai_inap
+    # Si el contenedor se cae por un error se reinicia, pero si termina bien (break) se queda apagado
+    restart: on-failure
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
