@@ -1,3 +1,0 @@
-pip install python-dotenv
-pip install requests
-pip install beautifulsoup4
