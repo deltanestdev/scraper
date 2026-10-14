@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 # Obtenemos la web
 url = "https://sede.inap.gob.es/es/procedimientos-y-servicios/seleccion/procesos-selectivos-de-cuerpos-y-escalas-generales/cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado-ingreso-libre-convocatoria-2025"
@@ -43,13 +44,14 @@ def buscar_plantilla():
         primer_enlace = li.find("a")
 
         if primer_enlace:
-            texto_enlace = primer_enlace.get_text(strip=True)
+            texto = primer_enlace.get_text(strip=True)
             href = primer_enlace.get("href", "")
 
             # Comprobamos si contiene el texto buscado
-            if "plantilla definitiva" in texto_enlace.lower():
+            if "plantilla definitiva" in texto.lower():
+                enlace = urljoin(url, href)
                 encontrado = True
-                texto = print(f"Texto: {texto_enlace}")
-                enlace = print(f"Enlace: {href}")
+                print(f"Texto: {texto}")
+                print(f"Enlace: {enlace}")
 
                 return texto, enlace
