@@ -49,6 +49,7 @@ def buscar_plantilla():
             # Comprobamos si contiene el texto buscado
             if "plantilla definitiva" in texto_enlace.lower():
                 encontrado = True
-                print(f"Tenemos la plantilla definitiva por fin")
-                print(f"Texto: {texto_enlace}")
-                print(f"Enlace: {href}")
+                texto = print(f"Texto: {texto_enlace}")
+                enlace = print(f"Enlace: {href}")
+
+                return texto, enlace
