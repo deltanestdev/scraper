@@ -16,42 +16,39 @@ headers = {
 def buscar_plantilla():
 
     # Descargamos el HTML pasando como argumento la url, el header y el timeout
-    respuesta = requests.get(url, headers=headers, timeout=5)
+    respuesta = requests.get(url, headers=headers, timeout=15)
 
     if respuesta.status_code == 200:
         # Indicamos que la codificación es UTF-8
         respuesta.encoding = "utf-8"
-        web = respuesta.text
-        with open("web.html", "w") as f:
-            f.write(web)
     else:
         print("Error en la petición")
         print(respuesta.status_code)
 
 
     # Parseamos el html y obtenemos el objeto soup
-    with open("web.html", "r") as f:
-        soup = BeautifulSoup(f, "html.parser")
 
-        # Las plantillas las publican en la cuarta lista
-        # Lo importante esta en el div de clase "inap__richText"
-        # Filtrado con el selector CSS
-        lista = soup.select_one("div.inap__richText > ul:nth-of-type(4)")
+    soup = BeautifulSoup(respuesta.text, "html.parser")
 
-        # Inicializamos la variable encontrado
-        encontrado = False
+    # Las plantillas las publican en la cuarta lista
+    # Lo importante esta en el div de clase "inap__richText"
+    # Filtrado con el selector CSS
+    lista = soup.select_one("div.inap__richText > ul:nth-of-type(4)")
 
-        # Bucle for para buscar
-        for li in lista.find_all("li", recursive=False):
-            primer_enlace = li.find("a")
+    # Inicializamos la variable encontrado
+    encontrado = False
 
-            if primer_enlace:
-                texto_enlace = primer_enlace.get_text(strip=True)
-                href = primer_enlace.get("href", "")
+    # Bucle for para buscar
+    for li in lista.find_all("li", recursive=False):
+        primer_enlace = li.find("a")
 
-                # Comprobamos si contiene el texto buscado
-                if "plantilla definitiva" in texto_enlace.lower():
-                    encontrado = True
-                    print(f"Tenemos la plantilla definitiva por fin")
-                    print(f"Texto: {texto_enlace}")
-                    print(f"Enlace: {href}")
+        if primer_enlace:
+            texto_enlace = primer_enlace.get_text(strip=True)
+            href = primer_enlace.get("href", "")
+
+            # Comprobamos si contiene el texto buscado
+            if "plantilla definitiva" in texto_enlace.lower():
+                encontrado = True
+                print(f"Tenemos la plantilla definitiva por fin")
+                print(f"Texto: {texto_enlace}")
+                print(f"Enlace: {href}")
